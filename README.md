@@ -47,7 +47,7 @@ Learning Retreat 2026 · School Sharing Session · Republic Polytechnic
 | **Web app (deck)** | https://aaron-chen-angus.github.io/learningretreat2026/ |
 | **Repository** | https://github.com/aaron-chen-angus/learningretreat2026 |
 | **Live results (Google Sheet)** | https://docs.google.com/spreadsheets/d/1PU45VVHvAU_0ka7CHSVRunT0t1itAuIkz477-yeda4I/edit?usp=sharing |
-| **R Shiny live dashboard** | *To be added after deployment to shinyapps.io* |
+| **R Shiny live dashboard** | https://01a0d8da-a349-e5dd-a124-59e1b69ed419.share.connect.posit.cloud/ |
 
 ### Student applications showcased (S3729C)
 
@@ -157,7 +157,7 @@ The deck has 13 slides. Timings are for the 20-minute slot.
 | 10 | Same tool, different thinking | 13:30–15:00 | Normal vs metacognitive prompting; tap Plan, Evaluate, Justify, Refine |
 | 11 | Spot the metacognitive prompt | 15:00–17:00 | Four school scenarios, one submission |
 | 12 | SMILE and beyond | 17:00–19:00 | Links to the SMILE portal, four SMILE apps and two accessory builds |
-| 13 | Thank you | 19:00–20:00 | Contact email |
+| 13 | Thank you | 19:00–20:00 | Contact email; links to the live R Shiny dashboard and this documentation (open in a new tab) |
 
 ### The eight S3729C moves and their L3 mapping
 
@@ -260,7 +260,7 @@ flowchart LR
     A[Audience phone or laptop] -->|HTTPS GET| B[GitHub Pages<br/>index.html + config.js]
     B -->|fetch POST, text/plain, no-cors<br/>JSON payload| C[Google Apps Script<br/>Web App doPost]
     C -->|LockService<br/>header-mapped appendRow| D[(Google Sheet<br/>5 tabs)]
-    D -->|gviz CSV export<br/>polled every 5–60 s| E[R Shiny dashboard<br/>shinyapps.io]
+    D -->|gviz CSV export<br/>polled every 5–60 s| E[R Shiny dashboard<br/>Posit Connect Cloud]
     E -->|projected live| F[Room display]
 ```
 
@@ -472,7 +472,7 @@ The dashboard recomputes correctness and scores from the raw choices and the ans
 
 ## 12. Live analytics dashboard (R Shiny)
 
-**File:** `dashboard/app.R` · **Deployed URL:** *to be added*
+**File:** `dashboard/app.R` · **Deployed URL:** https://01a0d8da-a349-e5dd-a124-59e1b69ed419.share.connect.posit.cloud/ (Posit Connect Cloud)
 
 ### 12.1 Data source
 
@@ -589,12 +589,14 @@ For complete submissions, the mean score out of 4 is reported with a 95% t-based
    install.packages(c("shiny", "bslib", "dplyr", "tidyr", "readr", "lubridate", "plotly", "htmltools", "rsconnect"))
    ```
 3. Test locally: `shiny::runApp("dashboard/app.R")`.
-4. Deploy to shinyapps.io:
-   ```r
-   rsconnect::setAccountInfo(name = "<account>", token = "<token>", secret = "<secret>")
-   rsconnect::deployApp(appDir = "dashboard", appFiles = "app.R", appName = "LearningRetreat2026")
-   ```
-5. Add the resulting URL to [Section 1](#1-live-resources).
+4. Deploy. The live dashboard is hosted on **Posit Connect Cloud** at https://01a0d8da-a349-e5dd-a124-59e1b69ed419.share.connect.posit.cloud/
+   - **Posit Connect Cloud (current host):** publish from https://connect.posit.cloud using this repository with `dashboard/app.R` as the primary file. To update, republish the existing content item rather than creating a new one, so the URL stays the same.
+   - **shinyapps.io (alternative):**
+     ```r
+     rsconnect::setAccountInfo(name = "<account>", token = "<token>", secret = "<secret>")
+     rsconnect::deployApp(appDir = "dashboard", appFiles = "app.R", appName = "LearningRetreat2026")
+     ```
+5. If the dashboard is ever redeployed to a new URL, update [Section 1](#1-live-resources), [Section 12](#12-live-analytics-dashboard-r-shiny) and the Thank You slide link in `index.html`.
 
 ### 14.5 End-to-end verification checklist
 
@@ -604,6 +606,7 @@ For complete submissions, the mean score out of 4 is reported with a 95% t-based
 - [ ] "Spot the metacognitive prompt" writes one row containing all answered schools
 - [ ] Selecting without submitting, then changing slide, writes nothing
 - [ ] The dashboard shows green "5 of 5 tabs" and new votes appear within one refresh interval
+- [ ] Both links on the Thank You slide open in a new tab: the live dashboard and this README
 
 ---
 

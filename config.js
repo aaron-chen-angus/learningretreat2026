@@ -6,5 +6,5 @@
    votes are only logged to the browser console and nothing is saved.
    ===================================================================== */
 window.LR_CONFIG = {
-  webhookUrl: ""
+  webhookUrl: "https://script.google.com/macros/s/AKfycbzcUxeM0J3wGzA0N-ChlWbTlkQQ_YyK53ucwtx0wVCteP-LFpUlVd_OLa4pOnmZ6R1g/exec"
 };

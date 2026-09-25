@@ -645,10 +645,10 @@ const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
-if(/[?&]reset\b/.test(location.search)){
-  try{ Object.keys(localStorage).filter(k=>k.startsWith("lr26_")).forEach(k=>localStorage.removeItem(k)); }catch(e){}
-  history.replaceState(null, "", location.pathname + location.hash);
-}
+/* Submissions are never remembered: every page load starts fresh.
+   Also clears answers saved by the earlier version of this deck. */
+try{ Object.keys(localStorage).filter(k=>k.startsWith("lr26_sent_")).forEach(k=>localStorage.removeItem(k)); }catch(e){}
+if(/[?&]reset\b/.test(location.search)) history.replaceState(null, "", location.pathname + location.hash);
 let PID = store.get("lr26_pid");
 if(!PID){ PID = "P-" + Math.random().toString(36).slice(2,8).toUpperCase(); store.set("lr26_pid", PID); }
 const DEVICE = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
@@ -742,7 +742,6 @@ function buildApps(){
 }
 
 function wireVote(box, a){
-  const key = "lr26_sent_"+a.id;
   const body = box.querySelector(".vote-body");
   const opts = [...box.querySelectorAll(".opt")];
   const submit = box.querySelector("[data-submit]");
@@ -764,8 +763,6 @@ function wireVote(box, a){
     status.textContent = "✓ Response submitted"; status.className = "status ok";
   }
 
-  const prior = store.get(key);
-  if(prior!==null){ body.classList.remove("hidden"); box.querySelector("[data-open]").classList.add("hidden"); lock(+prior); }
 
   submit.addEventListener("click", async ()=>{
     if(sel===null) return;
@@ -773,7 +770,7 @@ function wireVote(box, a){
     try{
       await send({ sheet:CONFIG.sheets[a.id], app:a.name, questionId:a.id.toUpperCase()+"_Q1",
         selected:["A","B"][sel], selectedText:a.opts[sel], correctAnswer:["A","B"][a.correct], isCorrect: sel===a.correct });
-      store.set(key, String(sel)); lock(sel);
+      lock(sel);
     }catch(err){
       status.textContent = "Couldn't send. Check your connection and tap Submit again."; status.className = "status err"; submit.disabled = false;
     }
@@ -804,7 +801,6 @@ function buildMeta(){
   const submit = document.getElementById("meta-submit");
   const status = document.getElementById("meta-status");
   const count = document.getElementById("meta-count");
-  const key = "lr26_sent_meta";
 
   function refresh(){ const n = picks.filter(p=>p!==null).length; count.textContent = n+" of 4 answered"; submit.disabled = n===0; }
   function lock(){
@@ -823,8 +819,6 @@ function buildMeta(){
     }));
   });
 
-  const prior = store.get(key);
-  if(prior){ try{ JSON.parse(prior).forEach((p,i)=>{ picks[i]=p; if(p!==null) wrap.querySelectorAll(".school")[i].querySelectorAll(".opt")[p].setAttribute("aria-checked","true"); }); }catch(e){} refresh(); lock(); }
 
   submit.addEventListener("click", async ()=>{
     if(picks.every(p=>p===null)) return;
@@ -836,7 +830,7 @@ function buildMeta(){
       payload[s.key+"Correct"] = p===null ? "" : (p===s.correct);
       if(p!==null){ payload.answered++; if(p===s.correct) payload.score++; }
     });
-    try{ await send(payload); store.set(key, JSON.stringify(picks)); lock(); }
+    try{ await send(payload); lock(); }
     catch(err){ status.textContent = "Couldn't send. Check your connection and tap Submit again."; status.className = "status err"; submit.disabled = false; }
   });
 

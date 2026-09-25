@@ -89,8 +89,10 @@ body.on-cover .badge, body.on-end .badge{opacity:0; pointer-events:none;}
 .cover-art img{width:100%; max-width:560px; display:block; margin:0 auto; filter:drop-shadow(0 0 30px rgba(0,229,255,.35));}
 .join{margin-top:26px; display:flex; gap:14px; align-items:center; padding:12px; width:max-content; max-width:100%;}
 .join .qr{background:#fff; padding:6px; border-radius:8px; line-height:0;}
-.join p{font-size:13.5px; color:var(--muted); max-width:22ch;}
+.join p{font-size:13.5px; color:var(--muted); max-width:none;}
 .join p b{color:var(--text); display:block; font-size:15px;}
+.join .site-link{display:block; margin-top:8px; color:var(--blue); font-weight:600; font-size:13.5px; text-decoration:none; border-bottom:1px solid var(--line2); width:max-content; white-space:nowrap;}
+.join .site-link:hover{text-shadow:0 0 10px rgba(0,229,255,.6);}
 @media (max-width:860px){ .cover{grid-template-columns:1fr;} .cover-art{order:-1;} .cover-art img{max-width:300px;} .join{display:none;} }
 
 /* ===== Levels ===== */
@@ -305,7 +307,7 @@ body.on-cover .badge, body.on-end .badge{opacity:0; pointer-events:none;}
         <div class="byline"><b>Aaron Chen Angus</b><br>Lead Specialist (Artificial Intelligence)<br>School of Sports and Health (SSH)</div>
         <div class="join panel">
           <div class="qr" id="qr-join"></div>
-          <p><b>Follow on your phone</b>Scan to open this deck and vote in the activities.</p>
+          <p><b>Follow on your phone</b>Scan to open this deck and vote in the activities.<a class="site-link" href="https://aaron-chen-angus.github.io/learningretreat2026/" target="_blank" rel="noopener">aaron-chen-angus.github.io/learningretreat2026</a></p>
         </div>
       </div>
       <div class="cover-art"><img id="cover-capy" alt="A capybara in glasses and a hoodie coding an R Shiny dashboard"></div>
@@ -494,13 +496,16 @@ body.on-cover .badge, body.on-end .badge{opacity:0; pointer-events:none;}
   <button class="nb" id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
 </nav>
 
+<script src="config.js?v=1"></script>
 <script>
 /* =====================================================================
-   CONFIG — paste the Google Apps Script Web App URL here once deployed.
+   CONFIG — the Google Apps Script Web App URL is set in config.js
+   (a separate small file), so index.html never needs editing for it.
    While empty, submissions are only logged to the console (demo mode).
    ===================================================================== */
+const SITE_URL = "https://aaron-chen-angus.github.io/learningretreat2026/";
 const CONFIG = {
-  webhookUrl: "",
+  webhookUrl: (window.LR_CONFIG && window.LR_CONFIG.webhookUrl) || "",
   sheets: {
     bv: "BalanceVision",
     sh: "SilverHYROX",
@@ -640,6 +645,10 @@ const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 };
+if(/[?&]reset\b/.test(location.search)){
+  try{ Object.keys(localStorage).filter(k=>k.startsWith("lr26_")).forEach(k=>localStorage.removeItem(k)); }catch(e){}
+  history.replaceState(null, "", location.pathname + location.hash);
+}
 let PID = store.get("lr26_pid");
 if(!PID){ PID = "P-" + Math.random().toString(36).slice(2,8).toUpperCase(); store.set("lr26_pid", PID); }
 const DEVICE = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
@@ -896,8 +905,7 @@ function initNav(){
 
 function initQR(){
   if(typeof QRCode === "undefined") return;
-  const base = location.href.split("#")[0];
-  new QRCode(document.getElementById("qr-join"), { text:base, width:112, height:112, colorDark:"#02050b", colorLight:"#ffffff" });
+  new QRCode(document.getElementById("qr-join"), { text:SITE_URL, width:112, height:112, colorDark:"#02050b", colorLight:"#ffffff" });
   APPS.forEach(a=>{ const el = document.getElementById("qr-"+a.id); if(el) new QRCode(el, { text:a.app, width:96, height:96, colorDark:"#02050b", colorLight:"#ffffff" }); });
 }
 
